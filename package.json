@@ -13,7 +13,7 @@
     "prepare": "husky install"
   },
   "keywords": [],
-  "author": "Alejandro Cerezo",
+  "author": "Camilo Isaza",
   "license": "ISC",
   "prettier": {
     "singleQuote": true

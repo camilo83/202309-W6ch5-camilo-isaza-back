@@ -1,56 +1,54 @@
-import { Request, Response } from 'express';
-import fs from 'fs';
+import { NextFunction, Request, Response } from 'express';
+import { ElementsFileRepo } from '../repos/elements.file.repo.js';
+import createDebug from 'debug';
 
-const dataFilePath = './api/db.json';
-let data: any[] = [];
+const debug = createDebug('W7E:elements:controller');
 
-try {
-  const rawData = fs.readFileSync(dataFilePath, 'utf-8');
-  data = JSON.parse(rawData).elements || [];
-} catch (error) {
-  console.error('Error al leer el archivo db.json:', error);
-}
-
-const writeDataToFile = () => {
-  try {
-    const jsonData = JSON.stringify({ elements: data }, null, 2);
-    fs.writeFileSync(dataFilePath, jsonData, 'utf-8');
-  } catch (error) {
-    console.error('Error al escribir en el archivo db.json:', error);
+export class ElementsController {
+  repo: ElementsFileRepo;
+  constructor() {
+    debug('Instantiated');
+    this.repo = new ElementsFileRepo();
   }
-};
 
-export const getAll = (_req: Request, res: Response) => {
-  res.json(data);
-};
+  async getAll(_req: Request, res: Response) {
+    const result = await this.repo.getAll();
+    res.json(result);
+  }
 
-export const getById = (req: Request, res: Response) => {
-  const result = data.find((item) => item.id === Number(req.params.id));
-  res.json(result);
-};
+  async getById(req: Request, res: Response, next: NextFunction) {
+    try {
+      debug('antes');
+      const result = await this.repo.getById(req.params.id);
+      debug('despues');
+      res.json(result);
+    } catch (error) {
+      next(error);
+    }
+  }
 
-export const search = (_req: Request, _res: Response) => {};
+  search = (_req: Request, _res: Response) => {};
 
-export const create = (req: Request, res: Response) => {
-  const result = { ...req.body, id: data.length + 1 };
-  data.push(result);
-  writeDataToFile();
-  res.json(result);
-};
+  async create(req: Request, res: Response) {
+    const result = await this.repo.create(req.body);
+    res.status(201);
+    res.statusMessage = 'Created';
+    res.json(result);
+  }
 
-export const update = (req: Request, res: Response) => {
-  let result = data.find((item) => Number(item.id) === Number(req.params.id));
-  result = { ...result, ...req.body };
-  data[data.findIndex((item) => item.id === Number(req.params.id))] = result!;
-  writeDataToFile();
-  res.json(result);
-};
+  async update(req: Request, res: Response) {
+    const result = await this.repo.update(req.params.id, req.body);
+    res.json(result);
+  }
 
-export const remove = (req: Request, res: Response) => {
-  data.splice(
-    data.findIndex((item) => item.id === Number(req.params.id)),
-    1
-  );
-  writeDataToFile();
-  res.json({});
-};
+  async delete(req: Request, res: Response, next: NextFunction) {
+    try {
+      await this.repo.delete(req.params.id);
+      res.status(204);
+      res.statusMessage = 'No Content';
+      res.json({});
+    } catch (error) {
+      next(error);
+    }
+  }
+}

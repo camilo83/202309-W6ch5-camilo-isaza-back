@@ -1,4 +1,4 @@
-export type element = {
+export type Element = {
   name: string;
   appearance: string;
   atomic_mass: number;
@@ -9,7 +9,7 @@ export type element = {
   melt: number;
   molar_heat: number;
   named_by: string;
-  id: number;
+  id: string;
   period: number;
   group: number;
   phase: string;

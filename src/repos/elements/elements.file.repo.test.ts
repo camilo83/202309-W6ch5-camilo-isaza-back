@@ -1,5 +1,5 @@
-import { Element } from '../entities/element';
-import { HttpError } from '../types/http.error';
+import { Element } from '../../entities/element';
+import { HttpError } from '../../types/http.error';
 import { ElementsFileRepo } from './elements.file.repo';
 import fs from 'fs/promises';
 

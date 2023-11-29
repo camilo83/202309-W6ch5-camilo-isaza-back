@@ -1,0 +1,16 @@
+import { ImgData } from '../types/imgData.js';
+import { Experiment } from './experiments.js';
+
+export type LoginUser = {
+  email: string;
+  passwd: string;
+};
+
+export type User = LoginUser & {
+  id: string;
+  name: string;
+  surname: string;
+  age: number;
+  avatar: ImgData;
+  experiments: Experiment[];
+};

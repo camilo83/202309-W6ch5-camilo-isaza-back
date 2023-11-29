@@ -1,26 +1,26 @@
 import { NextFunction, Request, Response } from 'express';
-import { ElementsFileRepo } from '../repos/elements.file.repo.js';
 import createDebug from 'debug';
+import { Element } from '../../entities/element.js';
+import { Repository } from '../../repos/repo.js';
 
 const debug = createDebug('W7E:elements:controller');
 
 export class ElementsController {
-  repo: ElementsFileRepo;
-  constructor() {
+  // eslint-disable-next-line no-unused-vars
+  constructor(private repo: Repository<Element>) {
     debug('Instantiated');
-    this.repo = new ElementsFileRepo();
   }
 
-  async getAll(_req: Request, res: Response) {
+  async getAll(req: Request, res: Response) {
     const result = await this.repo.getAll();
+    debug(result);
     res.json(result);
   }
 
   async getById(req: Request, res: Response, next: NextFunction) {
     try {
-      debug('antes');
+      debug('hola desde controller');
       const result = await this.repo.getById(req.params.id);
-      debug('despues');
       res.json(result);
     } catch (error) {
       next(error);
@@ -36,9 +36,13 @@ export class ElementsController {
     res.json(result);
   }
 
-  async update(req: Request, res: Response) {
-    const result = await this.repo.update(req.params.id, req.body);
-    res.json(result);
+  async update(req: Request, res: Response, next: NextFunction) {
+    try {
+      const result = await this.repo.update(req.params.id, req.body);
+      res.json(result);
+    } catch (error) {
+      next(error);
+    }
   }
 
   async delete(req: Request, res: Response, next: NextFunction) {
